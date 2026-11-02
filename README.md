@@ -6,7 +6,7 @@
 
 Работает прямо в браузере телефона: без установки, без сервера, без регистрации.
 
-### [➡️ Открыть приложение](https://samelit.github.io/inventory.html)
+### **[➡️ Открыть приложение](https://samelit.github.io/inventory.html)**
 
 </div>
 
