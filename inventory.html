@@ -62,7 +62,9 @@ li button{padding:4px 10px}
 #cam .bar{padding:12px;background:#000;color:#fff;display:flex;gap:8px;align-items:center}
 #stk{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px}
 #stk[hidden]{display:none}
-.sticker{background:#fff;color:#000;border-radius:14px;padding:14px 16px 12px;width:min(92vw,440px);font-family:Arial,Helvetica,sans-serif}
+.nav{position:absolute;top:50%;margin-top:-34px;width:44px;height:68px;padding:0;font-size:36px;line-height:1;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.55);color:#fff;border-radius:10px}
+.nav.l{left:6px}.nav.r{right:6px}.nav:disabled{opacity:.25}
+.sticker{background:#fff;color:#000;border-radius:14px;padding:14px 16px 12px;width:min(calc(100vw - 112px),440px);font-family:Arial,Helvetica,sans-serif}
 .sn{font-weight:700;font-size:18px;line-height:1.25;margin-bottom:10px;overflow-wrap:anywhere}
 .sb svg{display:block;width:100%;height:68px}
 .si{text-align:center;font-weight:700;font-size:21px;margin-top:6px;letter-spacing:.5px}
@@ -111,7 +113,7 @@ li button{padding:4px 10px}
 <button class="g" id="reset" style="width:100%">Начать заново</button>
 </main>
 
-<div id="stk" hidden><div class="sticker"><div class="sn" id="sn"></div><div class="sb" id="sb"></div><div class="si" id="si"></div></div><div class="sinfo" id="sinfo"></div><button id="stkClose">Закрыть</button></div>
+<div id="stk" hidden><button class="nav l" id="sprev" aria-label="Предыдущая позиция">‹</button><button class="nav r" id="snext" aria-label="Следующая позиция">›</button><div class="sticker"><div class="sn" id="sn"></div><div class="sb" id="sb"></div><div class="si" id="si"></div></div><div class="sinfo" id="sinfo"></div><button id="stkClose">Закрыть</button></div>
 
 <div id="cam">
   <div class="view"><video id="vid" playsinline muted></video><div id="frame"><i></i><i></i><i></i><i></i><u></u></div><div id="hint">Поместите штрихкод в рамку</div></div>
@@ -161,7 +163,7 @@ function code128svg(text){
   while(x<bits.length){if(bits.charAt(x)==='1'){y=x;while(y<bits.length&&bits.charAt(y)==='1')y++;r+='<rect x="'+(x+q)+'" y="0" width="'+(y-x)+'" height="60"/>';x=y}else x++}
   return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+W+' 60" preserveAspectRatio="none" fill="#000" role="img" aria-label="Штрихкод">'+r+'</svg>';
 }
-var CUR=[];
+var CUR=[],SI=-1;
 function showSticker(it){
   var nm=String(it.name||''),acc='',m=nm.match(/^(\d+)\s*-\s*(.*)$/);
   if(m){acc=m[1];nm=m[2]}
@@ -169,13 +171,31 @@ function showSticker(it){
   $('sb').innerHTML=code128svg(String(it.code));
   $('si').textContent=it.code;
   var info=[];
+  if(CUR.length>1)info.push((SI+1)+' из '+CUR.length);
   if(acc)info.push('Бух. номер: '+acc);
   if(it.from)info.push('Числится: '+short(it.from)+(it.mol?' · МОЛ '+it.mol:''));
   if(it.room)info.push('Найдено в: '+short(it.room));
   $('sinfo').innerHTML=info.map(esc).join('<br>');
+  $('sprev').disabled=SI<=0;$('snext').disabled=SI>=CUR.length-1;
   $('stk').hidden=false;
 }
+function stepSticker(d){var n=SI+d;if(n<0||n>=CUR.length)return;SI=n;showSticker(CUR[SI])}
 $('stkClose').addEventListener('click',function(){$('stk').hidden=true});
+$('sprev').addEventListener('click',function(){stepSticker(-1)});
+$('snext').addEventListener('click',function(){stepSticker(1)});
+document.addEventListener('keydown',function(e){
+  if($('stk').hidden)return;
+  var k=e.key;
+  if(k==='ArrowLeft'||k==='ArrowUp'){e.preventDefault();stepSticker(-1)}
+  else if(k==='ArrowRight'||k==='ArrowDown'){e.preventDefault();stepSticker(1)}
+  else if(k==='Escape'){$('stk').hidden=true}
+});
+var tx=null;
+$('stk').addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+$('stk').addEventListener('touchend',function(e){
+  if(tx==null)return;var dx=e.changedTouches[0].clientX-tx;tx=null;
+  if(Math.abs(dx)>60)stepSticker(dx>0?-1:1);
+},{passive:true});
 $('stk').addEventListener('click',function(e){if(e.target===this)this.hidden=true});
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 
@@ -307,7 +327,7 @@ $('stats').addEventListener('click',function(e){var b=e.target.closest('button')
 $('list').addEventListener('click',function(e){
   var b=e.target.closest('[data-del]');
   if(b){delete S.scans[b.dataset.del];render();save();return}
-  var li=e.target.closest('li[data-ix]');if(li&&CUR[+li.dataset.ix])showSticker(CUR[+li.dataset.ix]);
+  var li=e.target.closest('li[data-ix]');if(li&&CUR[+li.dataset.ix]){SI=+li.dataset.ix;showSticker(CUR[SI])}
 });
 
 $('add').addEventListener('click',function(){unlockAudio();scan($('code').value);$('code').value='';$('code').focus()});
