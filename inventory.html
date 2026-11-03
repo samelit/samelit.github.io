@@ -50,16 +50,33 @@ li button{padding:4px 10px}
 #cam{display:none;position:fixed;inset:0;background:#000;z-index:9;flex-direction:column}
 #cam .view{position:relative;flex:1;min-height:0;overflow:hidden}
 #cam video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-#cam{--fw:min(92vw,600px)}
-#frame{position:absolute;left:50%;top:50%;width:var(--fw);height:calc(var(--fw)*.32);transform:translate(-50%,-50%);border-radius:14px;box-shadow:0 0 0 200vmax rgba(40,44,50,.6);overflow:hidden}
+#frame{position:absolute;left:0;top:0;width:0;height:0;border-radius:14px;box-shadow:0 0 0 200vmax rgba(40,44,50,.6);overflow:hidden}
 #frame i{position:absolute;width:26px;height:26px;border:4px solid #fff}
 #frame i:nth-child(1){left:0;top:0;border-right:0;border-bottom:0;border-top-left-radius:14px}
 #frame i:nth-child(2){right:0;top:0;border-left:0;border-bottom:0;border-top-right-radius:14px}
 #frame i:nth-child(3){left:0;bottom:0;border-right:0;border-top:0;border-bottom-left-radius:14px}
 #frame i:nth-child(4){right:0;bottom:0;border-left:0;border-top:0;border-bottom-right-radius:14px}
 #frame u{position:absolute;left:6%;right:6%;top:50%;margin-top:-1px;height:2px;background:#ef4444;box-shadow:0 0 10px 2px rgba(239,68,68,.8)}
-#hint{position:absolute;left:0;right:0;top:calc(50% + var(--fw)*.16 + 16px);text-align:center;color:#fff;font-size:14px;padding:0 16px;text-shadow:0 1px 3px #000}
-#cam .bar{padding:12px;background:#000;color:#fff;display:flex;gap:8px;align-items:center}
+#hint{position:absolute;left:0;right:0;top:62%;text-align:center;color:#fff;font-size:14px;padding:0 16px;text-shadow:0 1px 3px #000}
+#cam .bar{padding:12px;background:#000;color:#fff;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+#cam .bar .btns{display:flex;gap:8px;flex:1 1 100%;justify-content:flex-end;align-items:center}
+.hd{position:absolute;touch-action:none;z-index:2}
+.hd[data-d=n]{left:30px;right:30px;top:0;height:30px;cursor:ns-resize}
+.hd[data-d=s]{left:30px;right:30px;bottom:0;height:30px;cursor:ns-resize}
+.hd[data-d=w]{top:30px;bottom:30px;left:0;width:30px;cursor:ew-resize}
+.hd[data-d=e]{top:30px;bottom:30px;right:0;width:30px;cursor:ew-resize}
+.hd[data-d=nw]{left:0;top:0;width:34px;height:34px;cursor:nwse-resize}
+.hd[data-d=se]{right:0;bottom:0;width:34px;height:34px;cursor:nwse-resize}
+.hd[data-d=ne]{right:0;top:0;width:34px;height:34px;cursor:nesw-resize}
+.hd[data-d=sw]{left:0;bottom:0;width:34px;height:34px;cursor:nesw-resize}
+.hd[data-d=n]::after,.hd[data-d=s]::after,.hd[data-d=w]::after,.hd[data-d=e]::after{content:"";position:absolute;border-radius:3px;background:rgba(255,255,255,.85)}
+.hd[data-d=n]::after{left:50%;margin-left:-16px;top:7px;width:32px;height:5px}
+.hd[data-d=s]::after{left:50%;margin-left:-16px;bottom:7px;width:32px;height:5px}
+.hd[data-d=w]::after{top:50%;margin-top:-16px;left:7px;width:5px;height:32px}
+.hd[data-d=e]::after{top:50%;margin-top:-16px;right:7px;width:5px;height:32px}
+.ico{padding:8px 14px}
+.bc{display:block;position:relative;width:30px;height:22px;border:2px solid currentColor;border-radius:5px;background:repeating-linear-gradient(90deg,currentColor 0 2px,transparent 2px 4px,currentColor 4px 5px,transparent 5px 8px) center/22px 12px no-repeat}
+.bc::after{content:"";position:absolute;right:-9px;bottom:-9px;width:14px;height:14px;border-radius:50%;background:linear-gradient(#fff,#fff) center/8px 2px no-repeat,linear-gradient(#fff,#fff) center/2px 8px no-repeat,#16a34a}
 #stk{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px}
 #stk[hidden]{display:none}
 .nav{position:absolute;top:50%;margin-top:-34px;width:44px;height:68px;padding:0;font-size:36px;line-height:1;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.55);color:#fff;border-radius:10px}
@@ -116,8 +133,8 @@ li button{padding:4px 10px}
 <div id="stk" hidden><button class="nav l" id="sprev" aria-label="Предыдущая позиция">‹</button><button class="nav r" id="snext" aria-label="Следующая позиция">›</button><div class="sticker"><div class="sn" id="sn"></div><div class="sb" id="sb"></div><div class="si" id="si"></div></div><div class="sinfo" id="sinfo"></div><button id="stkClose">Закрыть</button></div>
 
 <div id="cam">
-  <div class="view"><video id="vid" playsinline muted></video><div id="frame"><i></i><i></i><i></i><i></i><u></u></div><div id="hint">Поместите штрихкод в рамку</div></div>
-  <div class="bar"><span id="camMsg">Наведите на штрихкод</span><button id="torch" class="g" hidden>Подсветка</button><button id="camClose">Закрыть</button></div>
+  <div class="view"><video id="vid" playsinline muted></video><div id="frame"><i></i><i></i><i></i><i></i><u></u><b class="hd" data-d="n"></b><b class="hd" data-d="s"></b><b class="hd" data-d="w"></b><b class="hd" data-d="e"></b><b class="hd" data-d="nw"></b><b class="hd" data-d="ne"></b><b class="hd" data-d="sw"></b><b class="hd" data-d="se"></b></div><div id="hint">Поместите штрихкод в рамку. Края рамки можно тянуть, двойное касание возвращает квадрат.</div></div>
+  <div class="bar"><span id="camMsg">Наведите на штрихкод</span><div class="btns"><button id="imp" class="g ico" type="button" aria-label="Распознать штрихкод из изображения" title="Штрихкод из изображения"><i class="bc"></i></button><input id="impf" type="file" accept="image/*" hidden><button id="torch" class="g" hidden>Подсветка</button><button id="camClose">Закрыть</button></div></div>
 </div>
 
 <script>
@@ -368,6 +385,70 @@ $('torch').addEventListener('click',function(){
 });
 function stopCam(){clearInterval(timer);if(stream){stream.getTracks().forEach(function(t){t.stop()});stream=null}$('cam').style.display='none'}
 $('camClose').addEventListener('click',stopCam);
+var FR=null,drag=null;
+function viewRect(){return $('cam').querySelector('.view').getBoundingClientRect()}
+function applyFrame(){
+  var r=viewRect();if(!r.width)return;
+  if(!FR&&S.fr)FR=S.fr;
+  if(!FR){var q=Math.min(r.width,r.height)*0.68;FR={x:(r.width-q)/2/r.width,y:(r.height-q)/2/r.height,w:q/r.width,h:q/r.height}}
+  var f=$('frame');
+  f.style.left=FR.x*r.width+'px';f.style.top=FR.y*r.height+'px';
+  f.style.width=FR.w*r.width+'px';f.style.height=FR.h*r.height+'px';
+  $('hint').style.top=((FR.y+FR.h)*r.height+16)+'px';
+}
+$('frame').addEventListener('pointerdown',function(e){
+  var h=e.target.closest('[data-d]');if(!h||!FR)return;
+  e.preventDefault();
+  var r=viewRect();
+  drag={d:h.dataset.d,x:e.clientX,y:e.clientY,W:r.width,H:r.height,x0:FR.x*r.width,y0:FR.y*r.height,w0:FR.w*r.width,h0:FR.h*r.height};
+  try{h.setPointerCapture(e.pointerId)}catch(err){}
+});
+$('frame').addEventListener('pointermove',function(e){
+  if(!drag)return;
+  var d=drag.d,dx=e.clientX-drag.x,dy=e.clientY-drag.y,MIN=80,x=drag.x0,y=drag.y0,w=drag.w0,h=drag.h0;
+  if(d.indexOf('w')>=0){var nx=Math.min(Math.max(0,x+dx),x+w-MIN);w=x+w-nx;x=nx}
+  if(d.indexOf('e')>=0){w=Math.min(Math.max(MIN,w+dx),drag.W-x)}
+  if(d.indexOf('n')>=0){var ny=Math.min(Math.max(0,y+dy),y+h-MIN);h=y+h-ny;y=ny}
+  if(d.indexOf('s')>=0){h=Math.min(Math.max(MIN,h+dy),drag.H-y)}
+  FR={x:x/drag.W,y:y/drag.H,w:w/drag.W,h:h/drag.H};applyFrame();
+});
+function endDrag(){if(!drag)return;drag=null;S.fr=FR;save()}
+$('frame').addEventListener('pointerup',endDrag);
+$('frame').addEventListener('pointercancel',endDrag);
+$('frame').addEventListener('dblclick',function(){FR=null;S.fr=null;applyFrame();save()});
+window.addEventListener('resize',function(){if($('cam').style.display==='flex')applyFrame()});
+
+/* Штрихкод из изображения */
+function imgToCanvas(img,maxSide,rot){
+  var w=img.naturalWidth||img.width,h=img.naturalHeight||img.height,sc=Math.min(1,maxSide/Math.max(w,h));
+  var cw=Math.max(1,Math.round(w*sc)),ch=Math.max(1,Math.round(h*sc)),cv=document.createElement('canvas'),x=cv.getContext('2d');
+  if(rot){cv.width=ch;cv.height=cw;x.translate(ch,0);x.rotate(Math.PI/2)}else{cv.width=cw;cv.height=ch}
+  x.fillStyle='#fff';x.fillRect(0,0,cw,ch);x.drawImage(img,0,0,cw,ch);
+  return cv;
+}
+async function decodeCanvas(cv){
+  if(det){try{var r=await det.detect(cv);for(var i=0;i<r.length;i++){var v=String(r[i].rawValue||'').trim();if(v)return v}}catch(e){}}
+  if(typeof ZXing!=='undefined'){var c=zxDecode(cv);if(c)return String(c).trim()}
+  return null;
+}
+async function decodeImageFile(file){
+  var url=URL.createObjectURL(file),img=new Image();
+  try{
+    await new Promise(function(ok,no){img.onload=ok;img.onerror=no;img.src=url});
+    var tries=[[1600,0],[900,0],[1600,1],[2400,0]];
+    for(var i=0;i<tries.length;i++){var c=await decodeCanvas(imgToCanvas(img,tries[i][0],tries[i][1]));if(c)return c}
+    return null;
+  }finally{URL.revokeObjectURL(url)}
+}
+$('imp').addEventListener('click',function(){$('impf').click()});
+$('impf').addEventListener('change',function(e){
+  var f=e.target.files[0];e.target.value='';if(!f)return;
+  $('camMsg').textContent='Распознаю изображение…';
+  decodeImageFile(f).then(function(c){
+    if(c){last=c;lastT=Date.now();scan(c);showCamMsg()}
+    else{$('camMsg').textContent='Штрихкод на изображении не найден';alert('Штрихкод на изображении не найден. Попробуйте фото крупнее и резче или обрежьте его по штрихкоду.')}
+  }).catch(function(){$('camMsg').textContent='Не удалось открыть изображение'});
+});
 var zxR=null,busy=false,errs=0,useZx=false,coolUntil=0;
 function zxDecode(cv){
   try{
@@ -381,11 +462,12 @@ function zxDecode(cv){
     return zxR.decode(bm).getText();
   }catch(e){return null}
 }
+function showCamMsg(){$('camMsg').innerHTML='<b>'+esc(lastT1)+'</b>'+(lastT2?'<br>'+esc(lastT2):'')}
 function onCode(c){
   var n=Date.now();
   if(n<coolUntil)return;
   if(c===last&&n-lastT<2500)return;last=c;lastT=n;coolUntil=n+800;
-  scan(c);$('camMsg').innerHTML='<b>'+esc(lastT1)+'</b>'+(lastT2?'<br>'+esc(lastT2):'');
+  scan(c);showCamMsg();
 }
 $('camBtn').addEventListener('click',function(){
   unlockAudio();
@@ -400,7 +482,7 @@ $('camBtn').addEventListener('click',function(){
   navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080}}}).then(function(s){
     stream=s;setupTorch(s);var v=$('vid');v.srcObject=s;
     var pl=v.play();if(pl&&pl.catch)pl.catch(function(){});
-    $('cam').style.display='flex';busy=false;
+    $('cam').style.display='flex';busy=false;applyFrame();
     timer=setInterval(function(){
       if(busy)return;
       var vw=v.videoWidth,vh=v.videoHeight;if(!vw||!vh)return;
